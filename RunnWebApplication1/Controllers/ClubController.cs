@@ -50,8 +50,8 @@ namespace RunnWebApplication1.Controllers
                         State = clubVM.Address.State,
                     }
                 };
-            _clubRepository.Add(club);
-            return RedirectToAction("Index");
+                _clubRepository.Add(club);
+                return RedirectToAction("Index");
             }
             else
             {
@@ -59,5 +59,66 @@ namespace RunnWebApplication1.Controllers
             }
             return View(clubVM);
         }
+        public async Task<IActionResult> Edit(int id)
+        {
+            var club = await _clubRepository.GetByIdAsync(id);
+            if (club == null)
+            {
+                return View("Error");
+            }
+            var clubVm = new EditClubViewModel
+            {
+                Title = club.Title,
+                Description = club.Description,
+                AddressId = club.AddressId,
+                Address = club.Address,
+                URL = club.Image,
+                ClubCategory = club.ClubCategory
+            };
+            return View(clubVm);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, EditClubViewModel clubVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Failed to edit club");
+            }
+
+            var userClub = await _clubRepository.GetByIdAsyncNoTracking(id);
+
+            if (userClub != null)
+            {
+                try
+                {
+                    await _photoService.DeletePhotoAsync(userClub.Image);
+                }
+                catch (Exception ex)
+                {
+
+                    ModelState.AddModelError("", "Could not delete photo");
+                    return View(clubVM);
+                }
+                var photoResult = await _photoService.AddPhotoAsync(clubVM.Image);
+                var club = new Club
+                {
+                    Id = id,
+                    Title = clubVM.Title,
+                    Description = clubVM.Description,
+                    Image = photoResult.Uri.ToString(),
+                    AddressId = clubVM.AddressId,
+                    Address = clubVM.Address,
+                };
+
+                _clubRepository.Update(club);
+
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return View(clubVM);
+            }
+        }
+
     }
 }

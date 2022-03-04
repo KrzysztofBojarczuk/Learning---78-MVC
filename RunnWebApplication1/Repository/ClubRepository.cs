@@ -40,6 +40,12 @@ namespace RunnWebApplication1.Repository
         {
             return await _context.Clubs.Where(x => x.Address.City.Contains(city)).ToListAsync();
         }
+        public async Task<Club> GetByIdAsyncNoTracking(int id)
+        {
+            return await _context.Clubs.Include(x => x.Address).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+
 
         public bool Save()
         {
