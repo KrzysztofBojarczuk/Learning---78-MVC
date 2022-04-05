@@ -1,4 +1,5 @@
-﻿using RunnWebApplication1.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using RunnWebApplication1.Data;
 using RunnWebApplication1.Interfaces;
 using RunnWebApplication1.Models;
 
