@@ -66,5 +66,14 @@ namespace RunWebApplication1.Tests.Controller
 
 
         }
+        [Fact]
+        public void ClubController_Edit_ReturnSuccess()
+        {
+            var id = 5;
+            var club = A.Fake<Club>();
+            A.CallTo(() => _clubRepository.GetByIdAsync(id)).Returns(club);
+            var result = _clubController.Edit(id);
+            result.Should().BeOfType<Task<IActionResult>>();
+        }
     }
 }
